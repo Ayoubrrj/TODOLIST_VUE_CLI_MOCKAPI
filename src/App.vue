@@ -1,6 +1,6 @@
 <script setup>
 import AppHeader from "@/components/AppHeader.vue";
-import TodoList from "@/components/todoList/TodoList.vue";
+import TodoList from "@/components/todolist/TodoList.vue";
 import AppFooter from "@/components/AppFooter.vue";
 </script>
 

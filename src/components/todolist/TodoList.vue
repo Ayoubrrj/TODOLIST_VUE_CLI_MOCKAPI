@@ -1,15 +1,25 @@
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, computed } from "vue";
 import DB from "@/services/DB";
-import TodoListAddForm from "./TodoListAddForm.vue";
-import TodoListFooter from "./TodoListFooter.vue";
-import Todo from "./Todo.vue";
+import TodoListAddForm from "@/components/todolist/TodoListAddForm.vue";
+import TodoListFooter from "@/components/todolist/TodoListFooter.vue";
+import Todo from "@/components/todolist/Todo.vue";
 
 const props = defineProps({
     apiURL: { type: String, required: true },
 });
 
 const todos = reactive([]);
+
+const notCompletedCount = computed(
+    () => todos.filter((todo) => !todo.completed).length
+);
+
+// const notCompletedCount = computed(() => {
+//   return todos.filter((todo) => {
+//     return !todo.completed;
+//   }).length;
+// });
 
 onMounted(async () => {
     DB.setApiURL(props.apiURL);
@@ -62,7 +72,7 @@ const deleteOneById = async (id) => {
         </ul>
 
         <!-- FOOTER DE LISTE -->
-        <TodoListFooter />
+        <TodoListFooter :notCompletedCount="notCompletedCount" />
     </section>
 </template>
 <style scoped></style>
