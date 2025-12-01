@@ -5,14 +5,36 @@ import TodoListAddForm from "./TodoListAddForm.vue";
 import TodoListFooter from "./TodoListFooter.vue";
 import Todo from "./Todo.vue";
 
+const props = defineProps({
+    apiURL: { type: String, required: true },
+});
+
 const todos = reactive([]);
 
 onMounted(async () => {
-    DB.setApiURL("https://68db8534445fdb39dc25a900.mockapi.io/");
+    DB.setApiURL(props.apiURL);
     todos.splice(todos.length, 0, ...(await DB.findAll()));
-    console.table(todos);
 });
+
+// FONCTIONS CRUD
+// createItem
+// event: on-submit-add-form
+const createItem = async (content) => {
+    const todo = await DB.create(content);
+    todos.push(todo);
+};
+
+// deleteOneById(id)
+// event: on-delete
+const deleteOneById = async (id) => {
+    await DB.deleteOneById(id);
+    todos.splice(
+        todos.findIndex((todo) => todo.id === id),
+        1
+    );
+};
 </script>
+
 <template>
     <!-- CARD LISTE -->
     <section
@@ -22,24 +44,21 @@ onMounted(async () => {
         <h2 id="todo-heading" class="sr-only">Todo list</h2>
 
         <!-- INPUT PRINCIPAL -->
-        <TodoListAddForm />
+        <TodoListAddForm @on-submit-add-form="createItem($event)" />
 
         <!-- LISTE DES TODOS -->
         <ul
-            class="m-4 divide-y divide-slate-200 text-slate-800"
+            class="m-4 divide-y divide-slate-200 text-slate-600"
             role="list"
             aria-label="Todos"
         >
-            <!-- ITEM (exemple) <todo v-for="t in todos" :key="t.id" :turlututu="t" />-->
-            <todo v-for="todo in todos" :key="todo.id" :todo="todo" />
-
-            <!-- Message si aucun todo (à gérer en Vue) -->
-            <li
-                class="px-4 py-6 sm:px-5 text-slate-400 italic text-center hidden"
-                role="listitem"
-            >
-                No tasks yet.
-            </li>
+            <!-- ITEM (exemple) -->
+            <todo
+                v-for="todo in todos"
+                :key="todo.id"
+                :todo="todo"
+                @on-delete="deleteOneById($event)"
+            />
         </ul>
 
         <!-- FOOTER DE LISTE -->
